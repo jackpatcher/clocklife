@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>นาฬิกาชีวิต - Life Clock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        .clock-face {
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            position: relative;
+            background: conic-gradient(
+                from 90deg,
+                #1a1a2e 0deg,
+                #1a1a2e 180deg,
+                #f39c12 180deg,
+                #f39c12 360deg
+            );
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+        
+        .hour-mark {
+            position: absolute;
+            width: 3px;
+            height: 30px;
+            background: white;
+            left: 50%;
+            top: 15px;
+            transform-origin: 1.5px 285px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+        
+        .hour-number {
+            position: absolute;
+            color: white;
+            font-weight: 700;
+            font-size: 24px;
+            transform: translate(-50%, -50%);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 50%;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .activity-segment {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .center-dot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        
+        .day-night-icon {
+            position: absolute;
+            font-size: 20px;
+            z-index: 15;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background: white !important;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-layout {
+                display: flex !important;
+                width: 100vw;
+                height: 100vh;
+                page-break-inside: avoid;
+            }
+            
+            .print-clock {
+                flex: 0 0 60%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            
+            .print-info {
+                flex: 0 0 40%;
+                padding: 20px;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+            
+            .clock-face {
+                width: 500px !important;
+                height: 500px !important;
+                box-shadow: none !important;
+            }
+            
+            .hour-number {
+                font-size: 18px !important;
+            }
+            
+            @page {
+                size: A4 landscape;
+                margin: 0.5in;
+            }
+        }
+        
+        .print-layout {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-blue-50 min-h-screen p-4">
+    <div class="max-w-6xl mx-auto no-print">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">🕐 นาฬิกาชีวิต</h1>
+            <p class="text-gray-600">สร้างตารางกิจกรรมประจำวันของคุณในรูปแบบนาฬิกา 24 ชั่วโมง</p>
+        </div>
+
+        <!-- Owner Name Input -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <label class="block text-lg font-semibold text-gray-700 mb-2">👤 ชื่อเจ้าของนาฬิกาชีวิต:</label>
+            <input type="text" id="ownerName" placeholder="กรอกชื่อของคุณ..." 
+                   class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-lg">
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Clock Display -->
+            <div class="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold text-gray-800">
+                        <span id="clockTitle">นาฬิกาชีวิตของ: <span class="text-purple-600">ยังไม่ได้ใส่ชื่อ</span></span>
+                    </h2>
+                    <button onclick="printClock()" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center gap-2">
+                        🖨️ พิมพ์นาฬิกาชีวิต
+                    </button>
+                </div>
+                
+                <div class="flex justify-center">
+                    <div class="clock-face" id="clockFace">
+                        <!-- Hour marks and numbers will be generated by JavaScript -->
+                        <div class="center-dot"></div>
+                    </div>
+                </div>
+                
+                <!-- Legend -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold mb-3">🎨 สีกิจกรรม:</h3>
+                    <div class="grid grid-cols-2 gap-2 text-sm" id="colorLegend">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Form -->
+            <div class="space-y-6">
+                <!-- Add Activity Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">➕ เพิ่มกิจกรรม</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อกิจกรรม:</label>
+                            <input type="text" id="activityName" placeholder="เช่น นอนหลับ, ทำงาน, ออกกำลังกาย..." 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">เวลาเริ่ม:</label>
+                                <div class="flex gap-2">
+                                    <select id="startHour" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                        <option value="0">00</option>
+                                        <option value="1">01</option>
+                                        <option value="2">02</option>
+                                        <option value="3">03</option>
+                                        <option value="4">04</option>
+                                        <option value="5">05</option>
+                                        <option value="6">06</option>
+                                        <option value="7">07</option>
+                                        <option value="8">08</option>
+                                        <option value="9" selected>09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+                                    <span class="flex items-center text-gray-500">:</span>
+                                    <select id="startMinute" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                        <option value="0" selected>00</option>
+                                        <option value="15">15</option>
+                                        <option value="30">30</option>
+                                        <option value="45">45</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">เวลาสิ้นสุด:</label>
+                                <div class="flex gap-2">
+                                    <select id="endHour" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                        <option value="0">00</option>
+                                        <option value="1">01</option>
+                                        <option value="2">02</option>
+                                        <option value="3">03</option>
+                                        <option value="4">04</option>
+                                        <option value="5">05</option>
+                                        <option value="6">06</option>
+                                        <option value="7">07</option>
+                                        <option value="8">08</option>
+                                        <option value="9">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17" selected>17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+                                    <span class="flex items-center text-gray-500">:</span>
+                                    <select id="endMinute" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                        <option value="0" selected>00</option>
+                                        <option value="15">15</option>
+                                        <option value="30">30</option>
+                                        <option value="45">45</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">สีกิจกรรม:</label>
+                            <select id="activityColor" class="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <option value="#FF6B6B">🔴 แดง - งาน/การเรียน</option>
+                                <option value="#4ECDC4">🟢 เขียว - พักผ่อน</option>
+                                <option value="#45B7D1">🔵 น้ำเงิน - กีฬา/ออกกำลังกาย</option>
+                                <option value="#96CEB4">🟡 เหลือง - อาหาร</option>
+                                <option value="#FFEAA7">🟠 ส้ม - สังคม/เพื่อน</option>
+                                <option value="#DDA0DD">🟣 ม่วง - งานอดิเรก</option>
+                                <option value="#98D8C8">🩵 ฟ้า - การเดินทาง</option>
+                                <option value="#F7DC6F">🟤 น้ำตาล - นอนหลับ</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="addActivity()" 
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                            เพิ่มกิจกรรม
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Activity List -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">📋 รายการกิจกรรม</h2>
+                    <div id="activityList" class="space-y-2">
+                        <p class="text-gray-500 text-center py-4">ยังไม่มีกิจกรรม</p>
+                    </div>
+                </div>
+
+                <!-- Evaluation Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">⭐ ประเมินกิจกรรม</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">ความพึงพอใจโดยรวม:</label>
+                            <div class="flex space-x-2">
+                                <button onclick="setRating(1)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="1">⭐</button>
+                                <button onclick="setRating(2)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="2">⭐</button>
+                                <button onclick="setRating(3)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="3">⭐</button>
+                                <button onclick="setRating(4)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="4">⭐</button>
+                                <button onclick="setRating(5)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="5">⭐</button>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1" id="ratingText">คลิกดาวเพื่อให้คะแนน</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">ความคิดเห็น/ข้อเสนอแนะ:</label>
+                            <textarea id="feedback" rows="3" placeholder="เขียนความคิดเห็นเกี่ยวกับการใช้เวลาในวันนี้..." 
+                                      class="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none resize-none"></textarea>
+                        </div>
+                        
+                        <button onclick="saveEvaluation()" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                            บันทึกการประเมิน
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Layout -->
+    <div class="print-layout">
+        <div class="print-clock">
+            <div class="clock-face" id="printClockFace">
+                <div class="center-dot"></div>
+            </div>
+        </div>
+        <div class="print-info">
+            <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 20px; text-align: center;" id="printTitle">
+                นาฬิกาชีวิตของ: ยังไม่ได้ใส่ชื่อ
+            </h1>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">📋 รายการกิจกรรม:</h3>
+                <div id="printActivityList"></div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">🎨 สีกิจกรรม:</h3>
+                <div id="printColorLegend"></div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">📊 สถิติการใช้เวลา:</h3>
+                <div id="printStats"></div>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #666;">
+                สร้างโดย นาฬิกาชีวิต - Life Clock | วันที่พิมพ์: <span id="printDate"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activities = [];
+        let currentRating = 0;
+
+        // Initialize clock
+        function initializeClock() {
+            const clockFace = document.getElementById('clockFace');
+            
+            // Add hour marks, numbers, and day/night icons
+            for (let i = 0; i < 24; i++) {
+                // Hour marks - adjust so 12 is at top
+                const mark = document.createElement('div');
+                mark.className = 'hour-mark';
+                const adjustedAngle = ((i + 12) % 24) * 15;
+                mark.style.transform = `rotate(${adjustedAngle}deg)`;
+                clockFace.appendChild(mark);
+                
+                // Hour numbers - adjust so 12 is at top
+                const number = document.createElement('div');
+                number.className = 'hour-number';
+                const adjustedHour = (i + 12) % 24; // Shift by 12 hours so 12 is at top
+                const angle = (adjustedHour * 15) * Math.PI / 180;
+                const radius = 240;
+                const x = 300 + radius * Math.sin(angle);
+                const y = 300 - radius * Math.cos(angle);
+                number.style.left = x + 'px';
+                number.style.top = y + 'px';
+                number.textContent = i === 0 ? '24' : i;
+                clockFace.appendChild(number);
+                
+                // Add day/night icons
+                if (i % 6 === 0) { // Show icons every 6 hours
+                    const icon = document.createElement('div');
+                    icon.className = 'day-night-icon';
+                    const iconRadius = 200;
+                    const iconX = 300 + iconRadius * Math.sin(angle);
+                    const iconY = 300 - iconRadius * Math.cos(angle);
+                    icon.style.left = iconX + 'px';
+                    icon.style.top = iconY + 'px';
+                    icon.style.transform = 'translate(-50%, -50%)';
+                    
+                    // Determine day/night icon based on hour
+                    if (i >= 6 && i < 18) {
+                        icon.textContent = '☀️'; // Day time
+                    } else {
+                        icon.textContent = '🌙'; // Night time
+                    }
+                    
+                    clockFace.appendChild(icon);
+                }
+            }
+        }
+
+        // Initialize print clock
+        function initializePrintClock() {
+            const printClockFace = document.getElementById('printClockFace');
+            
+            // Clear existing content
+            printClockFace.innerHTML = '<div class="center-dot"></div>';
+            
+            // Add hour marks, numbers, and day/night icons for print version
+            for (let i = 0; i < 24; i++) {
+                // Hour marks - adjust so 12 is at top
+                const mark = document.createElement('div');
+                mark.className = 'hour-mark';
+                const adjustedAngle = ((i + 12) % 24) * 15;
+                mark.style.transform = `rotate(${adjustedAngle}deg)`;
+                printClockFace.appendChild(mark);
+                
+                // Hour numbers - adjust so 12 is at top
+                const number = document.createElement('div');
+                number.className = 'hour-number';
+                const adjustedHour = (i + 12) % 24;
+                const angle = (adjustedHour * 15) * Math.PI / 180;
+                const radius = 200; // Smaller radius for print
+                const x = 250 + radius * Math.sin(angle); // Adjusted for smaller clock
+                const y = 250 - radius * Math.cos(angle);
+                number.style.left = x + 'px';
+                number.style.top = y + 'px';
+                number.textContent = i === 0 ? '24' : i;
+                printClockFace.appendChild(number);
+                
+                // Add day/night icons
+                if (i % 6 === 0) {
+                    const icon = document.createElement('div');
+                    icon.className = 'day-night-icon';
+                    const iconRadius = 170; // Smaller radius for print
+                    const iconX = 250 + iconRadius * Math.sin(angle);
+                    const iconY = 250 - iconRadius * Math.cos(angle);
+                    icon.style.left = iconX + 'px';
+                    icon.style.top = iconY + 'px';
+                    icon.style.transform = 'translate(-50%, -50%)';
+                    
+                    if (i >= 6 && i < 18) {
+                        icon.textContent = '☀️';
+                    } else {
+                        icon.textContent = '🌙';
+                    }
+                    
+                    printClockFace.appendChild(icon);
+                }
+            }
+        }
+
+        // Update owner name
+        document.getElementById('ownerName').addEventListener('input', function() {
+            const name = this.value.trim();
+            const title = document.getElementById('clockTitle');
+            const printTitle = document.getElementById('printTitle');
+            if (name) {
+                title.innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">${name}</span>`;
+                printTitle.textContent = `นาฬิกาชีวิตของ: ${name}`;
+            } else {
+                title.innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">ยังไม่ได้ใส่ชื่อ</span>`;
+                printTitle.textContent = `นาฬิกาชีวิตของ: ยังไม่ได้ใส่ชื่อ`;
+            }
+        });
+
+        // Print function
+        function printClock() {
+            // Update print clock with current activities
+            updatePrintClock();
+            updatePrintInfo();
+            
+            // Set print date
+            document.getElementById('printDate').textContent = new Date().toLocaleDateString('th-TH');
+            
+            // Print
+            window.print();
+        }
+
+        // Update print clock
+        function updatePrintClock() {
+            initializePrintClock();
+            
+            const printClockFace = document.getElementById('printClockFace');
+
+            activities.forEach(activity => {
+                const segment = document.createElement('div');
+                segment.className = 'activity-segment';
+                
+                const startHour = activity.start / 60;
+                let endHour = activity.end / 60;
+                
+                function hourToAngle(hour) {
+                    hour = hour % 24;
+                    return ((hour + 12) % 24) * 15;
+                }
+                
+                const startAngleDeg = hourToAngle(startHour);
+                let endAngleDeg = hourToAngle(endHour);
+                
+                if (activity.end > 24 * 60) {
+                    endHour = (activity.end - 24 * 60) / 60;
+                    endAngleDeg = hourToAngle(endHour);
+                }
+                
+                const startAngle = (startAngleDeg - 90) * Math.PI / 180;
+                const endAngle = (endAngleDeg - 90) * Math.PI / 180;
+                
+                const centerX = 250; // Adjusted for print size
+                const centerY = 250;
+                const radius = 225;
+                const innerRadius = 150;
+                
+                const x1 = centerX + innerRadius * Math.cos(startAngle);
+                const y1 = centerY + innerRadius * Math.sin(startAngle);
+                const x2 = centerX + radius * Math.cos(startAngle);
+                const y2 = centerY + radius * Math.sin(startAngle);
+                const x3 = centerX + radius * Math.cos(endAngle);
+                const y3 = centerY + radius * Math.sin(endAngle);
+                const x4 = centerX + innerRadius * Math.cos(endAngle);
+                const y4 = centerY + innerRadius * Math.sin(endAngle);
+                
+                let angleDiff = endAngleDeg - startAngleDeg;
+                if (activity.end > 24 * 60) {
+                    if (angleDiff < 0) angleDiff += 360;
+                } else if (angleDiff <= 0) {
+                    angleDiff += 360;
+                }
+                const largeArcFlag = angleDiff > 180 ? 1 : 0;
+                
+                const pathData = [
+                    `M ${x1} ${y1}`,
+                    `L ${x2} ${y2}`,
+                    `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x3} ${y3}`,
+                    `L ${x4} ${y4}`,
+                    `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1} ${y1}`,
+                    'Z'
+                ].join(' ');
+                
+                // Text path for print
+                const textPathRadius = (innerRadius + radius) / 2;
+                const textStartAngle = startAngleDeg - 90;
+                const textEndAngle = endAngleDeg - 90;
+                
+                let textAngleDiff = endAngleDeg - startAngleDeg;
+                if (activity.end > 24 * 60) {
+                    if (textAngleDiff < 0) textAngleDiff += 360;
+                } else if (textAngleDiff <= 0) {
+                    textAngleDiff += 360;
+                }
+                
+                const textStartX = centerX + textPathRadius * Math.cos(textStartAngle * Math.PI / 180);
+                const textStartY = centerY + textPathRadius * Math.sin(textStartAngle * Math.PI / 180);
+                const textEndX = centerX + textPathRadius * Math.cos(textEndAngle * Math.PI / 180);
+                const textEndY = centerY + textPathRadius * Math.sin(textEndAngle * Math.PI / 180);
+                
+                const textLargeArcFlag = textAngleDiff > 180 ? 1 : 0;
+                const textPathData = `M ${textStartX} ${textStartY} A ${textPathRadius} ${textPathRadius} 0 ${textLargeArcFlag} 1 ${textEndX} ${textEndY}`;
+                
+                const uniqueId = `printTextPath_${activity.id}`;
+                
+                segment.innerHTML = `
+                    <svg width="500" height="500" style="position: absolute; top: 0; left: 0;">
+                        <defs>
+                            <path id="${uniqueId}" d="${textPathData}" />
+                        </defs>
+                        <path d="${pathData}" fill="${activity.color}" opacity="0.8" stroke="white" stroke-width="2"/>
+                        <text fill="white" font-size="12" font-weight="bold">
+                            <textPath href="#${uniqueId}" startOffset="50%" text-anchor="middle">
+                                ${activity.name.length > 10 ? activity.name.substring(0, 10) + '...' : activity.name}
+                            </textPath>
+                        </text>
+                    </svg>
+                `;
+                
+                printClockFace.appendChild(segment);
+            });
+        }
+
+        // Update print info
+        function updatePrintInfo() {
+            // Activity list for print
+            const printActivityList = document.getElementById('printActivityList');
+            if (activities.length === 0) {
+                printActivityList.innerHTML = '<p style="color: #666;">ยังไม่มีกิจกรรม</p>';
+            } else {
+                printActivityList.innerHTML = activities.map(activity => {
+                    const duration = ((activity.end > 24 * 60 ? activity.end - activity.start : activity.end - activity.start) / 60).toFixed(1);
+                    return `
+                        <div style="margin-bottom: 8px; display: flex; align-items: center;">
+                            <div style="width: 12px; height: 12px; background-color: ${activity.color}; border-radius: 2px; margin-right: 8px;"></div>
+                            <div style="flex: 1;">
+                                <strong>${activity.name}</strong><br>
+                                <span style="font-size: 10px; color: #666;">${activity.startTime} - ${activity.endTime} (${duration} ชม.)</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Color legend for print
+            const printColorLegend = document.getElementById('printColorLegend');
+            const usedColors = [...new Set(activities.map(a => a.color))];
+            const colorNames = {
+                '#FF6B6B': '🔴 งาน/การเรียน',
+                '#4ECDC4': '🟢 พักผ่อน',
+                '#45B7D1': '🔵 กีฬา/ออกกำลังกาย',
+                '#96CEB4': '🟡 อาหาร',
+                '#FFEAA7': '🟠 สังคม/เพื่อน',
+                '#DDA0DD': '🟣 งานอดิเรก',
+                '#98D8C8': '🩵 การเดินทาง',
+                '#F7DC6F': '🟤 นอนหลับ'
+            };
+
+            printColorLegend.innerHTML = usedColors.map(color => `
+                <div style="margin-bottom: 4px; display: flex; align-items: center;">
+                    <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 2px; margin-right: 6px;"></div>
+                    <span style="font-size: 10px;">${colorNames[color] || 'อื่นๆ'}</span>
+                </div>
+            `).join('');
+
+            // Statistics for print
+            const printStats = document.getElementById('printStats');
+            if (activities.length === 0) {
+                printStats.innerHTML = '<p style="color: #666;">ยังไม่มีข้อมูลสถิติ</p>';
+            } else {
+                const stats = {};
+                let totalTime = 0;
+                
+                activities.forEach(activity => {
+                    const duration = (activity.end > 24 * 60 ? activity.end - activity.start : activity.end - activity.start) / 60;
+                    const colorName = colorNames[activity.color] || 'อื่นๆ';
+                    
+                    if (!stats[colorName]) {
+                        stats[colorName] = { time: 0, color: activity.color };
+                    }
+                    stats[colorName].time += duration;
+                    totalTime += duration;
+                });
+
+                const statsHtml = Object.entries(stats).map(([name, data]) => {
+                    const percentage = ((data.time / totalTime) * 100).toFixed(1);
+                    return `
+                        <div style="margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 10px; height: 10px; background-color: ${data.color}; border-radius: 2px; margin-right: 6px;"></div>
+                                <span style="font-size: 10px;">${name}</span>
+                            </div>
+                            <span style="font-size: 10px; font-weight: bold;">${data.time.toFixed(1)} ชม. (${percentage}%)</span>
+                        </div>
+                    `;
+                }).join('');
+
+                printStats.innerHTML = statsHtml + `
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ccc;">
+                        <strong style="font-size: 12px;">รวมทั้งหมด: ${totalTime.toFixed(1)} ชั่วโมง</strong>
+                    </div>
+                `;
+            }
+        }
+
+        // Add activity
+        function addActivity() {
+            const name = document.getElementById('activityName').value.trim();
+            const startHour = parseInt(document.getElementById('startHour').value);
+            const startMinute = parseInt(document.getElementById('startMinute').value);
+            const endHour = parseInt(document.getElementById('endHour').value);
+            const endMinute = parseInt(document.getElementById('endMinute').value);
+            const color = document.getElementById('activityColor').value;
+
+            if (!name) {
+                alert('กรุณากรอกชื่อกิจกรรม');
+                return;
+            }
+
+            const start = startHour * 60 + startMinute;
+            let end = endHour * 60 + endMinute;
+
+            // Handle overnight activities (e.g., 23:00 to 06:00)
+            if (end <= start) {
+                end += 24 * 60; // Add 24 hours in minutes
+            }
+
+            const startTime = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+            const endTime = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
+
+            const activity = {
+                id: Date.now(),
+                name,
+                startTime,
+                endTime,
+                color,
+                start,
+                end
+            };
+
+            activities.push(activity);
+            updateClock();
+            updateActivityList();
+            clearForm();
+            
+            console.log('Activity added:', activity); // Debug log
+        }
+
+        // Parse time to minutes
+        function parseTime(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // Format time
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+        }
+
+        // Update clock display
+        function updateClock() {
+            // Remove existing activity segments
+            const existingSegments = document.querySelectorAll('.activity-segment');
+            existingSegments.forEach(segment => segment.remove());
+
+            const clockFace = document.getElementById('clockFace');
+
+            activities.forEach(activity => {
+                const segment = document.createElement('div');
+                segment.className = 'activity-segment';
+                
+                // Convert start and end times to hours (with minutes as decimal)
+                const startHour = activity.start / 60;
+                let endHour = activity.end / 60;
+                
+                // Adjust for 24-hour clock where 12 is at top (not 0)
+                // Map hours to clock positions: 12->0°, 18->90°, 0->180°, 6->270°
+                function hourToAngle(hour) {
+                    // Normalize hour to 0-24 range
+                    hour = hour % 24;
+                    // Convert to angle where 12 o'clock is at top (0°)
+                    return ((hour + 12) % 24) * 15; // 15 degrees per hour
+                }
+                
+                const startAngleDeg = hourToAngle(startHour);
+                let endAngleDeg = hourToAngle(endHour);
+                
+                // Handle overnight activities
+                if (activity.end > 24 * 60) {
+                    endHour = (activity.end - 24 * 60) / 60;
+                    endAngleDeg = hourToAngle(endHour);
+                }
+                
+                // Convert to radians
+                const startAngle = (startAngleDeg - 90) * Math.PI / 180; // -90 to adjust SVG coordinate system
+                const endAngle = (endAngleDeg - 90) * Math.PI / 180;
+                
+                // Create arc segment
+                const centerX = 300;
+                const centerY = 300;
+                const radius = 270;
+                const innerRadius = 180;
+                
+                const x1 = centerX + innerRadius * Math.cos(startAngle);
+                const y1 = centerY + innerRadius * Math.sin(startAngle);
+                const x2 = centerX + radius * Math.cos(startAngle);
+                const y2 = centerY + radius * Math.sin(startAngle);
+                const x3 = centerX + radius * Math.cos(endAngle);
+                const y3 = centerY + radius * Math.sin(endAngle);
+                const x4 = centerX + innerRadius * Math.cos(endAngle);
+                const y4 = centerY + innerRadius * Math.sin(endAngle);
+                
+                // Determine if we need large arc flag
+                let angleDiff = endAngleDeg - startAngleDeg;
+                if (activity.end > 24 * 60) {
+                    // Overnight activity
+                    if (angleDiff < 0) angleDiff += 360;
+                } else if (angleDiff <= 0) {
+                    angleDiff += 360;
+                }
+                const largeArcFlag = angleDiff > 180 ? 1 : 0;
+                
+                const pathData = [
+                    `M ${x1} ${y1}`,
+                    `L ${x2} ${y2}`,
+                    `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x3} ${y3}`,
+                    `L ${x4} ${y4}`,
+                    `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1} ${y1}`,
+                    'Z'
+                ].join(' ');
+                
+                // Calculate text position at midpoint of arc
+                let midAngleDeg = startAngleDeg + angleDiff / 2;
+                if (midAngleDeg >= 360) midAngleDeg -= 360;
+                const midAngle = (midAngleDeg - 90) * Math.PI / 180;
+                
+                const textRadius = (innerRadius + radius) / 2;
+                const textX = centerX + textRadius * Math.cos(midAngle);
+                const textY = centerY + textRadius * Math.sin(midAngle);
+                
+                // Create curved text path
+                const textPathRadius = (innerRadius + radius) / 2;
+                const textStartAngle = startAngleDeg - 90; // Adjust for SVG coordinate system
+                const textEndAngle = endAngleDeg - 90;
+                
+                // Calculate arc length for text path
+                let textAngleDiff = endAngleDeg - startAngleDeg;
+                if (activity.end > 24 * 60) {
+                    if (textAngleDiff < 0) textAngleDiff += 360;
+                } else if (textAngleDiff <= 0) {
+                    textAngleDiff += 360;
+                }
+                
+                // Create text path arc
+                const textStartX = centerX + textPathRadius * Math.cos(textStartAngle * Math.PI / 180);
+                const textStartY = centerY + textPathRadius * Math.sin(textStartAngle * Math.PI / 180);
+                const textEndX = centerX + textPathRadius * Math.cos(textEndAngle * Math.PI / 180);
+                const textEndY = centerY + textPathRadius * Math.sin(textEndAngle * Math.PI / 180);
+                
+                const textLargeArcFlag = textAngleDiff > 180 ? 1 : 0;
+                const textPathData = `M ${textStartX} ${textStartY} A ${textPathRadius} ${textPathRadius} 0 ${textLargeArcFlag} 1 ${textEndX} ${textEndY}`;
+                
+                const uniqueId = `textPath_${activity.id}`;
+                
+                segment.innerHTML = `
+                    <svg width="600" height="600" style="position: absolute; top: 0; left: 0; pointer-events: none;">
+                        <defs>
+                            <path id="${uniqueId}" d="${textPathData}" />
+                        </defs>
+                        <path d="${pathData}" fill="${activity.color}" opacity="0.8" stroke="white" stroke-width="3" style="pointer-events: all; cursor: pointer;"/>
+                        <text fill="white" font-size="14" font-weight="bold" style="pointer-events: none;">
+                            <textPath href="#${uniqueId}" startOffset="50%" text-anchor="middle">
+                                ${activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
+                            </textPath>
+                        </text>
+                    </svg>
+                `;
+                
+                segment.title = `${activity.name}\n${activity.startTime} - ${activity.endTime}`;
+                segment.style.pointerEvents = 'all';
+                segment.style.cursor = 'pointer';
+                
+                // Add click event to show activity details
+                segment.addEventListener('click', function() {
+                    showActivityDetails(activity);
+                });
+                
+                clockFace.appendChild(segment);
+            });
+
+            updateColorLegend();
+        }
+
+        // Update activity list
+        function updateActivityList() {
+            const list = document.getElementById('activityList');
+            
+            if (activities.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center py-4">ยังไม่มีกิจกรรม</p>';
+                return;
+            }
+
+            list.innerHTML = activities.map(activity => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-4 h-4 rounded" style="background-color: ${activity.color}"></div>
+                        <div>
+                            <div class="font-medium">${activity.name}</div>
+                            <div class="text-sm text-gray-600">${activity.startTime} - ${activity.endTime}</div>
+                        </div>
+                    </div>
+                    <button onclick="removeActivity(${activity.id})" 
+                            class="text-red-500 hover:text-red-700 font-bold text-lg">×</button>
+                </div>
+            `).join('');
+        }
+
+        // Update color legend
+        function updateColorLegend() {
+            const legend = document.getElementById('colorLegend');
+            const usedColors = [...new Set(activities.map(a => a.color))];
+            
+            const colorNames = {
+                '#FF6B6B': '🔴 งาน/การเรียน',
+                '#4ECDC4': '🟢 พักผ่อน',
+                '#45B7D1': '🔵 กีฬา/ออกกำลังกาย',
+                '#96CEB4': '🟡 อาหาร',
+                '#FFEAA7': '🟠 สังคม/เพื่อน',
+                '#DDA0DD': '🟣 งานอดิเรก',
+                '#98D8C8': '🩵 การเดินทาง',
+                '#F7DC6F': '🟤 นอนหลับ'
+            };
+
+            legend.innerHTML = usedColors.map(color => `
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 rounded" style="background-color: ${color}"></div>
+                    <span class="text-xs">${colorNames[color] || 'อื่นๆ'}</span>
+                </div>
+            `).join('');
+        }
+
+        // Remove activity
+        function removeActivity(id) {
+            activities = activities.filter(activity => activity.id !== id);
+            updateClock();
+            updateActivityList();
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('activityName').value = '';
+            document.getElementById('startHour').value = '9';
+            document.getElementById('startMinute').value = '0';
+            document.getElementById('endHour').value = '17';
+            document.getElementById('endMinute').value = '0';
+        }
+
+        // Rating system
+        function setRating(rating) {
+            currentRating = rating;
+            const buttons = document.querySelectorAll('.rating-btn');
+            const ratingText = document.getElementById('ratingText');
+            
+            buttons.forEach((btn, index) => {
+                if (index < rating) {
+                    btn.style.color = '#FFD700';
+                } else {
+                    btn.style.color = '#D1D5DB';
+                }
+            });
+
+            const ratingTexts = [
+                'คลิกดาวเพื่อให้คะแนน',
+                '😞 ไม่พอใจมาก',
+                '😐 ไม่พอใจ',
+                '😊 ปานกลาง',
+                '😄 พอใจ',
+                '🤩 พอใจมาก'
+            ];
+            
+            ratingText.textContent = ratingTexts[rating];
+        }
+
+        // Save evaluation
+        function saveEvaluation() {
+            const feedback = document.getElementById('feedback').value.trim();
+            
+            if (currentRating === 0) {
+                alert('กรุณาให้คะแนนความพึงพอใจ');
+                return;
+            }
+
+            alert(`บันทึกการประเมินเรียบร้อย!\nคะแนน: ${currentRating}/5 ดาว\nความคิดเห็น: ${feedback || 'ไม่มี'}`);
+            
+            // Reset evaluation form
+            currentRating = 0;
+            document.getElementById('feedback').value = '';
+            setRating(0);
+        }
+
+        // Show activity details when clicked
+        function showActivityDetails(activity) {
+            const duration = activity.end > 24 * 60 ? 
+                (activity.end - activity.start) / 60 : 
+                (activity.end - activity.start) / 60;
+            
+            const endTimeDisplay = activity.end > 24 * 60 ? 
+                `${activity.endTime} (+1 วัน)` : 
+                activity.endTime;
+            
+            alert(`📋 รายละเอียดกิจกรรม\n\n` +
+                  `🏷️ ชื่อ: ${activity.name}\n` +
+                  `⏰ เวลา: ${activity.startTime} - ${endTimeDisplay}\n` +
+                  `⏱️ ระยะเวลา: ${duration.toFixed(1)} ชั่วโมง\n` +
+                  `🎨 สี: ${getColorName(activity.color)}`);
+        }
+        
+        // Get color name from color code
+        function getColorName(colorCode) {
+            const colorNames = {
+                '#FF6B6B': '🔴 แดง - งาน/การเรียน',
+                '#4ECDC4': '🟢 เขียว - พักผ่อน',
+                '#45B7D1': '🔵 น้ำเงิน - กีฬา/ออกกำลังกาย',
+                '#96CEB4': '🟡 เหลือง - อาหาร',
+                '#FFEAA7': '🟠 ส้ม - สังคม/เพื่อน',
+                '#DDA0DD': '🟣 ม่วง - งานอดิเรก',
+                '#98D8C8': '🩵 ฟ้า - การเดินทาง',
+                '#F7DC6F': '🟤 น้ำตาล - นอนหลับ'
+            };
+            return colorNames[colorCode] || 'อื่นๆ';
+        }
+
+        // Initialize the application
+        initializeClock();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9730e1359576731f',t:'MTc1NTg1MDA4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
