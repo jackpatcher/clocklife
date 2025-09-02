@@ -17,13 +17,7 @@
             height: 600px;
             border-radius: 50%;
             position: relative;
-            background: conic-gradient(
-                from 90deg,
-                #1a1a2e 0deg,
-                #1a1a2e 180deg,
-                #f39c12 180deg,
-                #f39c12 360deg
-            );
+            background: var(--clock-gradient, linear-gradient(to bottom, #f9d976 0%, #f39c12 20%, #e96443 40%, #232526 60%, #414345 80%, #000000 100%));
             box-shadow: 0 30px 60px rgba(0,0,0,0.3);
         }
         
@@ -135,6 +129,34 @@
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-blue-50 min-h-screen p-4">
     <div class="max-w-6xl mx-auto no-print">
+        <!-- เลือกสีพื้นหลังกราฟ 6 สี (กลางวัน 3, กลางคืน 3) -->
+        <div class="flex flex-wrap justify-center gap-6 mb-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 1</label>
+                <input type="color" id="bgDay1" value="#f9d976" class="w-10 h-8 border rounded-lg" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 2</label>
+                <input type="color" id="bgDay2" value="#f39c12" class="w-10 h-8 border rounded-lg" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 3</label>
+                <input type="color" id="bgDay3" value="#e96443" class="w-10 h-8 border rounded-lg" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 1</label>
+                <input type="color" id="bgNight1" value="#232526" class="w-10 h-8 border rounded-lg" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 2</label>
+                <input type="color" id="bgNight2" value="#414345" class="w-10 h-8 border rounded-lg" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 3</label>
+                <input type="color" id="bgNight3" value="#000000" class="w-10 h-8 border rounded-lg" />
+            </div>
+        </div>
+
         <!-- Header -->
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">🕐 นาฬิกาชีวิต</h1>
@@ -271,16 +293,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">สีกิจกรรม:</label>
-                            <select id="activityColor" class="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
-                                <option value="#FF6B6B">🔴 แดง - งาน/การเรียน</option>
-                                <option value="#4ECDC4">🟢 เขียว - พักผ่อน</option>
-                                <option value="#45B7D1">🔵 น้ำเงิน - กีฬา/ออกกำลังกาย</option>
-                                <option value="#96CEB4">🟡 เหลือง - อาหาร</option>
-                                <option value="#FFEAA7">🟠 ส้ม - สังคม/เพื่อน</option>
-                                <option value="#DDA0DD">🟣 ม่วง - งานอดิเรก</option>
-                                <option value="#98D8C8">🩵 ฟ้า - การเดินทาง</option>
-                                <option value="#F7DC6F">🟤 น้ำตาล - นอนหลับ</option>
-                            </select>
+                            <input type="color" id="activityColor" value="#FF6B6B" class="w-12 h-8 p-1 border rounded-lg" />
                         </div>
                         
                         <button onclick="addActivity()" 
@@ -481,6 +494,25 @@
                 printTitle.textContent = `นาฬิกาชีวิตของ: ยังไม่ได้ใส่ชื่อ`;
             }
         });
+
+        // ฟังก์ชันอัพเดท linear-gradient background
+        function updateClockBackground() {
+            const day1 = document.getElementById('bgDay1').value;
+            const day2 = document.getElementById('bgDay2').value;
+            const day3 = document.getElementById('bgDay3').value;
+            const night1 = document.getElementById('bgNight1').value;
+            const night2 = document.getElementById('bgNight2').value;
+            const night3 = document.getElementById('bgNight3').value;
+            const gradient = `linear-gradient(to bottom, ${day1} 0%, ${day2} 20%, ${day3} 40%, ${night1} 60%, ${night2} 80%, ${night3} 100%)`;
+            document.querySelector('.clock-face').style.setProperty('--clock-gradient', gradient);
+        }
+
+        // Event listeners for color pickers
+        // ให้ background อัพเดททันทีเมื่อเลือกสี
+        ['bgDay1','bgDay2','bgDay3','bgNight1','bgNight2','bgNight3'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateClockBackground);
+        });
+        updateClockBackground();
 
         // Print function
         function printClock() {
@@ -741,127 +773,137 @@
 
             const clockFace = document.getElementById('clockFace');
 
-            activities.forEach(activity => {
-                const segment = document.createElement('div');
-                segment.className = 'activity-segment';
-                
-                // Convert start and end times to hours (with minutes as decimal)
-                const startHour = activity.start / 60;
-                let endHour = activity.end / 60;
-                
-                // Adjust for 24-hour clock where 12 is at top (not 0)
-                // Map hours to clock positions: 12->0°, 18->90°, 0->180°, 6->270°
-                function hourToAngle(hour) {
-                    // Normalize hour to 0-24 range
-                    hour = hour % 24;
-                    // Convert to angle where 12 o'clock is at top (0°)
-                    return ((hour + 12) % 24) * 15; // 15 degrees per hour
-                }
-                
-                const startAngleDeg = hourToAngle(startHour);
-                let endAngleDeg = hourToAngle(endHour);
-                
-                // Handle overnight activities
-                if (activity.end > 24 * 60) {
-                    endHour = (activity.end - 24 * 60) / 60;
-                    endAngleDeg = hourToAngle(endHour);
-                }
-                
-                // Convert to radians
-                const startAngle = (startAngleDeg - 90) * Math.PI / 180; // -90 to adjust SVG coordinate system
-                const endAngle = (endAngleDeg - 90) * Math.PI / 180;
-                
-                // Create arc segment
-                const centerX = 300;
-                const centerY = 300;
-                const radius = 270;
-                const innerRadius = 180;
-                
-                const x1 = centerX + innerRadius * Math.cos(startAngle);
-                const y1 = centerY + innerRadius * Math.sin(startAngle);
-                const x2 = centerX + radius * Math.cos(startAngle);
-                const y2 = centerY + radius * Math.sin(startAngle);
-                const x3 = centerX + radius * Math.cos(endAngle);
-                const y3 = centerY + radius * Math.sin(endAngle);
-                const x4 = centerX + innerRadius * Math.cos(endAngle);
-                const y4 = centerY + innerRadius * Math.sin(endAngle);
-                
-                // Determine if we need large arc flag
-                let angleDiff = endAngleDeg - startAngleDeg;
-                if (activity.end > 24 * 60) {
-                    // Overnight activity
-                    if (angleDiff < 0) angleDiff += 360;
-                } else if (angleDiff <= 0) {
-                    angleDiff += 360;
-                }
-                const largeArcFlag = angleDiff > 180 ? 1 : 0;
-                
-                const pathData = [
-                    `M ${x1} ${y1}`,
-                    `L ${x2} ${y2}`,
-                    `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x3} ${y3}`,
-                    `L ${x4} ${y4}`,
-                    `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1} ${y1}`,
-                    'Z'
-                ].join(' ');
-                
-                // Calculate text position at midpoint of arc
-                let midAngleDeg = startAngleDeg + angleDiff / 2;
-                if (midAngleDeg >= 360) midAngleDeg -= 360;
-                const midAngle = (midAngleDeg - 90) * Math.PI / 180;
-                
-                const textRadius = (innerRadius + radius) / 2;
-                const textX = centerX + textRadius * Math.cos(midAngle);
-                const textY = centerY + textRadius * Math.sin(midAngle);
-                
-                // Create curved text path
-                const textPathRadius = (innerRadius + radius) / 2;
-                const textStartAngle = startAngleDeg - 90; // Adjust for SVG coordinate system
-                const textEndAngle = endAngleDeg - 90;
-                
-                // Calculate arc length for text path
-                let textAngleDiff = endAngleDeg - startAngleDeg;
-                if (activity.end > 24 * 60) {
-                    if (textAngleDiff < 0) textAngleDiff += 360;
-                } else if (textAngleDiff <= 0) {
-                    textAngleDiff += 360;
-                }
-                
-                // Create text path arc
-                const textStartX = centerX + textPathRadius * Math.cos(textStartAngle * Math.PI / 180);
-                const textStartY = centerY + textPathRadius * Math.sin(textStartAngle * Math.PI / 180);
-                const textEndX = centerX + textPathRadius * Math.cos(textEndAngle * Math.PI / 180);
-                const textEndY = centerY + textPathRadius * Math.sin(textEndAngle * Math.PI / 180);
-                
-                const textLargeArcFlag = textAngleDiff > 180 ? 1 : 0;
-                const textPathData = `M ${textStartX} ${textStartY} A ${textPathRadius} ${textPathRadius} 0 ${textLargeArcFlag} 1 ${textEndX} ${textEndY}`;
-                
-                const uniqueId = `textPath_${activity.id}`;
-                
-                segment.innerHTML = `
+            // คำนวณ layer ของแต่ละกิจกรรม (กิจกรรมที่ทับกันจะถูกวาดใน layer ที่ต่างกัน)
+            // สร้าง array ของ layers: [{activity, layer}]
+            var baseInnerRadius = 160; // จุดเริ่มรัศมีใหญ่ขึ้น
+            var layerWidth = 20; // ความหนาแต่ละ layer กว้างขึ้น
+            let layers = [];
+            activities.forEach((activity, idx) => {
+            // หา layer ที่กิจกรรมนี้ไม่ทับกับกิจกรรมอื่นใน layer เดียวกัน
+            let layer = 0;
+            while (true) {
+                let overlap = layers.some(l => l.layer === layer &&
+                ((activity.start < l.activity.end && activity.end > l.activity.start) ||
+                 (activity.end > 24*60 && l.activity.end > 24*60 && activity.start < l.activity.end && activity.end > l.activity.start))
+                );
+                if (!overlap) break;
+                layer++;
+            }
+            layers.push({activity, layer});
+            });
+
+            layers.forEach(({activity, layer}) => {
+            const segment = document.createElement('div');
+            segment.className = 'activity-segment';
+
+            // Convert start and end times to hours (with minutes as decimal)
+            const startHour = activity.start / 60;
+            let endHour = activity.end / 60;
+
+            function hourToAngle(hour) {
+                hour = hour % 24;
+                return ((hour + 12) % 24) * 15;
+            }
+
+            const startAngleDeg = hourToAngle(startHour);
+            let endAngleDeg = hourToAngle(endHour);
+
+            if (activity.end > 24 * 60) {
+                endHour = (activity.end - 24 * 60) / 60;
+                endAngleDeg = hourToAngle(endHour);
+            }
+
+            const startAngle = (startAngleDeg - 90) * Math.PI / 180;
+            const endAngle = (endAngleDeg - 90) * Math.PI / 180;
+
+            const centerX = 300;
+            const centerY = 300;
+            const layerInnerRadius = baseInnerRadius + layer * layerWidth;
+            const layerOuterRadius = layerInnerRadius + layerWidth;
+
+            const x1 = centerX + layerInnerRadius * Math.cos(startAngle);
+            const y1 = centerY + layerInnerRadius * Math.sin(startAngle);
+            const x2 = centerX + layerOuterRadius * Math.cos(startAngle);
+            const y2 = centerY + layerOuterRadius * Math.sin(startAngle);
+            const x3 = centerX + layerOuterRadius * Math.cos(endAngle);
+            const y3 = centerY + layerOuterRadius * Math.sin(endAngle);
+            const x4 = centerX + layerInnerRadius * Math.cos(endAngle);
+            const y4 = centerY + layerInnerRadius * Math.sin(endAngle);
+
+            let angleDiff = endAngleDeg - startAngleDeg;
+            if (activity.end > 24 * 60) {
+                if (angleDiff < 0) angleDiff += 360;
+            } else if (angleDiff <= 0) {
+                angleDiff += 360;
+            }
+            const largeArcFlag = angleDiff > 180 ? 1 : 0;
+
+            const pathData = [
+                `M ${x1} ${y1}`,
+                `L ${x2} ${y2}`,
+                `A ${layerOuterRadius} ${layerOuterRadius} 0 ${largeArcFlag} 1 ${x3} ${y3}`,
+                `L ${x4} ${y4}`,
+                `A ${layerInnerRadius} ${layerInnerRadius} 0 ${largeArcFlag} 0 ${x1} ${y1}`,
+                'Z'
+            ].join(' ');
+
+            // Calculate text position at midpoint of arc
+            let midAngleDeg = startAngleDeg + angleDiff / 2;
+            if (midAngleDeg >= 360) midAngleDeg -= 360;
+            const midAngle = (midAngleDeg - 90) * Math.PI / 180;
+
+            const textRadius = (layerInnerRadius + layerOuterRadius) / 2;
+            const textX = centerX + textRadius * Math.cos(midAngle);
+            const textY = centerY + textRadius * Math.sin(midAngle);
+
+            // Create curved text path
+            const textPathRadius = (layerInnerRadius + layerOuterRadius) / 2;
+            const textStartAngle = startAngleDeg - 90;
+            const textEndAngle = endAngleDeg - 90;
+
+            let textAngleDiff = endAngleDeg - startAngleDeg;
+            if (activity.end > 24 * 60) {
+                if (textAngleDiff < 0) textAngleDiff += 360;
+            } else if (textAngleDiff <= 0) {
+                textAngleDiff += 360;
+            }
+
+            const textStartX = centerX + textPathRadius * Math.cos(textStartAngle * Math.PI / 180);
+            const textStartY = centerY + textPathRadius * Math.sin(textStartAngle * Math.PI / 180);
+            const textEndX = centerX + textPathRadius * Math.cos(textEndAngle * Math.PI / 180);
+            const textEndY = centerY + textPathRadius * Math.sin(textEndAngle * Math.PI / 180);
+
+            const textLargeArcFlag = textAngleDiff > 180 ? 1 : 0;
+            const textPathData = `M ${textStartX} ${textStartY} A ${textPathRadius} ${textPathRadius} 0 ${textLargeArcFlag} 1 ${textEndX} ${textEndY}`;
+
+            const uniqueId = `textPath_${activity.id}`;
+
+            segment.innerHTML = `
                     <svg width="600" height="600" style="position: absolute; top: 0; left: 0; pointer-events: none;">
                         <defs>
+                            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.25"/>
+                            </filter>
                             <path id="${uniqueId}" d="${textPathData}" />
                         </defs>
-                        <path d="${pathData}" fill="${activity.color}" opacity="0.8" stroke="white" stroke-width="3" style="pointer-events: all; cursor: pointer;"/>
-                        <text fill="white" font-size="14" font-weight="bold" style="pointer-events: none;">
+                        <path d="${pathData}" fill="${activity.color}" opacity="0.92" stroke="#fff" stroke-width="4" style="pointer-events: all; cursor: pointer;" filter="url(#shadow)"/>
+                        <text fill="#fff" font-size="15" font-weight="bold" style="pointer-events: none;">
                             <textPath href="#${uniqueId}" startOffset="50%" text-anchor="middle">
                                 ${activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
                             </textPath>
                         </text>
                     </svg>
-                `;
-                
-                segment.title = `${activity.name}\n${activity.startTime} - ${activity.endTime}`;
-                segment.style.pointerEvents = 'all';
-                segment.style.cursor = 'pointer';
-                
-                // Add click event to show activity details
-                segment.addEventListener('click', function() {
-                    showActivityDetails(activity);
-                });
-                
-                clockFace.appendChild(segment);
+            `;
+
+            segment.title = `${activity.name}\n${activity.startTime} - ${activity.endTime}`;
+            segment.style.pointerEvents = 'all';
+            segment.style.cursor = 'pointer';
+
+            segment.addEventListener('click', function() {
+                showActivityDetails(activity);
+            });
+
+            clockFace.appendChild(segment);
             });
 
             updateColorLegend();
@@ -870,25 +912,55 @@
         // Update activity list
         function updateActivityList() {
             const list = document.getElementById('activityList');
-            
             if (activities.length === 0) {
                 list.innerHTML = '<p class="text-gray-500 text-center py-4">ยังไม่มีกิจกรรม</p>';
                 return;
             }
-
-            list.innerHTML = activities.map(activity => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 rounded" style="background-color: ${activity.color}"></div>
-                        <div>
-                            <div class="font-medium">${activity.name}</div>
-                            <div class="text-sm text-gray-600">${activity.startTime} - ${activity.endTime}</div>
+            list.innerHTML = activities.map(activity => {
+                const duration = (activity.end > 24 * 60 ? activity.end - activity.start : activity.end - activity.start) / 60;
+                const isEditing = activity.isEditing;
+                if (isEditing) {
+                    // Edit mode
+                    return `
+                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-4 h-4 rounded" style="background-color: ${activity.color}"></div>
+                            <div>
+                                <input type="text" class="font-medium border rounded px-2 py-1" id="editName_${activity.id}" value="${activity.name}" style="width:120px;">
+                                <div class="text-sm text-gray-600">
+                                    <input type="time" id="editStart_${activity.id}" value="${activity.startTime}"> - 
+                                    <input type="time" id="editEnd_${activity.id}" value="${activity.endTime}">
+                                </div>
+                                <input type="color" id="editColor_${activity.id}" value="${activity.color}" class="mt-2 p-2 border rounded-lg w-12 h-8" />
+                                <div class="text-xs text-gray-500 mt-1">${duration.toFixed(1)} ชั่วโมง</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="saveEditActivity(${activity.id})" class="text-green-600 hover:text-green-800 font-bold text-lg">✔️</button>
+                            <button onclick="cancelEditActivity(${activity.id})" class="text-gray-500 hover:text-gray-700 font-bold text-lg">❌</button>
                         </div>
                     </div>
-                    <button onclick="removeActivity(${activity.id})" 
-                            class="text-red-500 hover:text-red-700 font-bold text-lg">×</button>
-                </div>
-            `).join('');
+                    `;
+                } else {
+                    // Normal mode
+                    return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-4 h-4 rounded" style="background-color: ${activity.color}"></div>
+                            <div>
+                                <div class="font-medium">${activity.name}</div>
+                                <div class="text-sm text-gray-600">${activity.startTime} - ${activity.endTime}</div>
+                                <div class="text-xs text-gray-500">${duration.toFixed(1)} ชั่วโมง</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editActivity(${activity.id})" class="text-blue-500 hover:text-blue-700 font-bold text-lg">แก้ไข</button>
+                            <button onclick="removeActivity(${activity.id})" class="text-red-500 hover:text-red-700 font-bold text-lg">×</button>
+                        </div>
+                    </div>
+                    `;
+                }
+            }).join('');
         }
 
         // Update color legend
@@ -918,6 +990,50 @@
         // Remove activity
         function removeActivity(id) {
             activities = activities.filter(activity => activity.id !== id);
+            updateClock();
+            updateActivityList();
+        }
+
+        // Edit activity
+        function editActivity(id) {
+            activities = activities.map(activity => activity.id === id ? { ...activity, isEditing: true } : { ...activity, isEditing: false });
+            updateActivityList();
+        }
+
+        // Cancel edit
+        function cancelEditActivity(id) {
+            activities = activities.map(activity => activity.id === id ? { ...activity, isEditing: false } : activity);
+            updateActivityList();
+        }
+
+        // Save edit
+        function saveEditActivity(id) {
+            const nameInput = document.getElementById(`editName_${id}`);
+            const startInput = document.getElementById(`editStart_${id}`);
+            const endInput = document.getElementById(`editEnd_${id}`);
+            const colorInput = document.getElementById(`editColor_${id}`);
+            if (!nameInput.value.trim()) {
+                alert('กรุณากรอกชื่อกิจกรรม');
+                return;
+            }
+            const start = parseTime(startInput.value);
+            let end = parseTime(endInput.value);
+            if (end <= start) end += 24 * 60;
+            activities = activities.map(activity => {
+                if (activity.id === id) {
+                    return {
+                        ...activity,
+                        name: nameInput.value.trim(),
+                        startTime: startInput.value,
+                        endTime: endInput.value,
+                        color: colorInput.value,
+                        start,
+                        end,
+                        isEditing: false
+                    };
+                }
+                return activity;
+            });
             updateClock();
             updateActivityList();
         }
@@ -1009,5 +1125,5 @@
         // Initialize the application
         initializeClock();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9730e1359576731f',t:'MTc1NTg1MDA4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
