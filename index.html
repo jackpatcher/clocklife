@@ -977,12 +977,18 @@ function showToast(message, type = 'info') {
                 '#F7DC6F': '🟤 นอนหลับ'
             };
 
-            printColorLegend.innerHTML = usedColors.map(color => `
-                <div style="margin-bottom: 4px; display: flex; align-items: center;">
+            printColorLegend.innerHTML = usedColors.map(color => {
+                let label = colorNames[color];
+                if (!label) {
+                    // รวมชื่อกิจกรรมที่ใช้สีนี้ทั้งหมด
+                    const acts = activities.filter(a => a.color === color).map(a => a.name);
+                    label = acts.length ? acts.join(', ') : 'อื่นๆ';
+                }
+                return `<div style="margin-bottom: 4px; display: flex; align-items: center;">
                     <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 2px; margin-right: 6px;"></div>
-                    <span style="font-size: 10px;">${colorNames[color] || 'อื่นๆ'}</span>
-                </div>
-            `).join('');
+                    <span style="font-size: 10px;">${label}</span>
+                </div>`;
+            }).join('');
 
             // Statistics for print
             const printStats = document.getElementById('printStats');
