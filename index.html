@@ -20,7 +20,6 @@
             background: var(--clock-gradient, linear-gradient(to bottom, #f9d976 0%, #f39c12 20%, #e96443 40%, #232526 60%, #414345 80%, #000000 100%));
             box-shadow: 0 30px 60px rgba(0,0,0,0.3);
         }
-        
         .hour-mark {
             position: absolute;
             width: 3px;
@@ -31,7 +30,6 @@
             transform-origin: 1.5px 285px;
             box-shadow: 0 0 5px rgba(0,0,0,0.3);
         }
-        
         .hour-number {
             position: absolute;
             color: white;
@@ -129,33 +127,39 @@
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-blue-50 min-h-screen p-4">
     <div class="max-w-6xl mx-auto no-print">
-        <!-- เลือกสีพื้นหลังกราฟ 6 สี (กลางวัน 3, กลางคืน 3) -->
-        <div class="flex flex-wrap justify-center gap-6 mb-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 1</label>
-                <input type="color" id="bgDay1" value="#f9d976" class="w-10 h-8 border rounded-lg" />
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 2</label>
-                <input type="color" id="bgDay2" value="#f39c12" class="w-10 h-8 border rounded-lg" />
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 3</label>
-                <input type="color" id="bgDay3" value="#e96443" class="w-10 h-8 border rounded-lg" />
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 1</label>
-                <input type="color" id="bgNight1" value="#232526" class="w-10 h-8 border rounded-lg" />
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 2</label>
-                <input type="color" id="bgNight2" value="#414345" class="w-10 h-8 border rounded-lg" />
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 3</label>
-                <input type="color" id="bgNight3" value="#000000" class="w-10 h-8 border rounded-lg" />
-            </div>
+        <div class="flex justify-end mb-4">
+            <!-- Removed duplicate copy link button -->
         </div>
+
+        <!-- ...existing code... -->
+    <!-- ...existing code... -->
+    <!-- เลือกสีพื้นหลังกราฟ 6 สี (กลางวัน 3, กลางคืน 3) -->
+    <div class="flex flex-wrap justify-center gap-6 mt-12 mb-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 1</label>
+            <input type="color" id="bgDay1" value="#f9d976" class="w-10 h-8 border rounded-lg" />
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 2</label>
+            <input type="color" id="bgDay2" value="#f39c12" class="w-10 h-8 border rounded-lg" />
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 3</label>
+            <input type="color" id="bgDay3" value="#e96443" class="w-10 h-8 border rounded-lg" />
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 1</label>
+            <input type="color" id="bgNight1" value="#232526" class="w-10 h-8 border rounded-lg" />
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 2</label>
+            <input type="color" id="bgNight2" value="#414345" class="w-10 h-8 border rounded-lg" />
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 3</label>
+            <input type="color" id="bgNight3" value="#000000" class="w-10 h-8 border rounded-lg" />
+        </div>
+    </div>
 
         <!-- Header -->
         <div class="text-center mb-8">
@@ -293,7 +297,10 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">สีกิจกรรม:</label>
-                            <input type="color" id="activityColor" value="#FF6B6B" class="w-12 h-8 p-1 border rounded-lg" />
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="activityColor" value="#FF6B6B" class="w-12 h-8 p-1 border rounded-lg" />
+                                <div id="activityColorPreview" style="width:32px;height:32px;border-radius:8px;border:1px solid #ccc;background:#FF6B6B;"></div>
+                            </div>
                         </div>
                         
                         <button onclick="addActivity()" 
@@ -340,12 +347,21 @@
                         </button>
                     </div>
                 </div>
+                    <!-- JSON String Input Box (always visible, at the bottom of main container) -->
+                <div class="mt-8 mb-8">
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">🔗 JSON string (แก้ไขข้อมูลกิจกรรมและ background ได้โดยตรง):</label>
+                    <textarea id="jsonStringBox" rows="6" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm font-mono" spellcheck="false"></textarea>
+                    <div class="text-right mt-2">
+                        <button id="copyLinkBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">คัดลอกลิงค์</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Print Layout -->
     <div class="print-layout">
+
         <div class="print-clock">
             <div class="clock-face" id="printClockFace">
                 <div class="center-dot"></div>
@@ -378,6 +394,251 @@
     </div>
 
     <script>
+        // On first load, decode data from URL and put in JSON string box, then update UI
+        window.addEventListener('DOMContentLoaded', async function() {
+            const params = new URLSearchParams(window.location.search);
+            const jsonBox = document.getElementById('jsonStringBox');
+            if (params.has('data') && jsonBox) {
+                try {
+                    const encoded = params.get('data');
+                    const jsonStr = decodeBase64(encoded);
+                    jsonBox.value = jsonStr;
+                    // รอให้ textarea set ค่าเสร็จ แล้วอัพเดท UI จาก text box
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                    try {
+                        const data = JSON.parse(jsonStr);
+                        // owner
+                        if (data.owner !== undefined) {
+                            document.getElementById('ownerName').value = data.owner;
+                        }
+                        // background
+                        if (data.background) {
+                            document.getElementById('bgDay1').value = data.background.bgDay1 || '#f9d976';
+                            document.getElementById('bgDay2').value = data.background.bgDay2 || '#f39c12';
+                            document.getElementById('bgDay3').value = data.background.bgDay3 || '#e96443';
+                            document.getElementById('bgNight1').value = data.background.bgNight1 || '#232526';
+                            document.getElementById('bgNight2').value = data.background.bgNight2 || '#414345';
+                            document.getElementById('bgNight3').value = data.background.bgNight3 || '#000000';
+                        }
+                        // activities
+                        if (Array.isArray(data.activities)) {
+                            activities = data.activities;
+                        }
+                        updateAllAndUrl();
+                    } catch (e) {
+                        // ignore if invalid
+                    }
+                } catch (e) {
+                    // ignore if invalid
+                }
+            }
+        });
+        // --- ฟีเจอร์คัดลอกลิงค์และอัพเดท real-time ---
+        // Real-time polling interval (ms)
+        const POLL_INTERVAL = 1000;
+        let lastJsonString = '';
+
+        // Base64 encode/decode helpers
+        function encodeBase64(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+        function decodeBase64(str) {
+            return decodeURIComponent(escape(atob(str)));
+        }
+
+        // Copy link with current data in query string
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyBtn = document.getElementById('copyLinkBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    // Always use the value from the JSON string textarea
+                    const jsonStr = document.getElementById('jsonStringBox').value;
+                    const base64 = encodeBase64(jsonStr);
+                    // Generate link from origin + pathname + ?data=...
+                    const url = window.location.origin + window.location.pathname + '?data=' + base64;
+                    navigator.clipboard.writeText(url).then(() => {
+                        showToast('คัดลอกลิงก์เรียบร้อย! สามารถนำไปวางได้เลย', 'success');
+                    });
+                });
+            }
+        });
+
+        // Real-time update when JSON string changes
+        function startRealtimeJsonPolling() {
+            setInterval(() => {
+                const jsonBox = document.getElementById('jsonStringBox');
+                if (!jsonBox) return;
+                const jsonStr = jsonBox.value.trim();
+                if (jsonStr && jsonStr !== lastJsonString) {
+                    try {
+                        const newData = JSON.parse(jsonStr);
+                        // owner
+                        if (newData.owner !== undefined) {
+                            document.getElementById('ownerName').value = newData.owner;
+                            // update chart and print title immediately
+                            const title = document.getElementById('clockTitle');
+                            const printTitle = document.getElementById('printTitle');
+                            if (newData.owner) {
+                                title.innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">${newData.owner}</span>`;
+                                printTitle.textContent = `นาฬิกาชีวิตของ: ${newData.owner}`;
+                            } else {
+                                title.innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">ยังไม่ได้ใส่ชื่อ</span>`;
+                                printTitle.textContent = `นาฬิกาชีวิตของ: ยังไม่ได้ใส่ชื่อ`;
+                            }
+                        }
+                        // background
+                        if (newData.background) {
+                            document.getElementById('bgDay1').value = newData.background.bgDay1 || '#f9d976';
+                            document.getElementById('bgDay2').value = newData.background.bgDay2 || '#f39c12';
+                            document.getElementById('bgDay3').value = newData.background.bgDay3 || '#e96443';
+                            document.getElementById('bgNight1').value = newData.background.bgNight1 || '#232526';
+                            document.getElementById('bgNight2').value = newData.background.bgNight2 || '#414345';
+                            document.getElementById('bgNight3').value = newData.background.bgNight3 || '#000000';
+                        }
+                        // activities
+                        if (Array.isArray(newData.activities)) {
+                            activities = newData.activities;
+                        }
+                        updateAllAndUrl();
+                        lastJsonString = jsonStr;
+                        // Sync data to URL
+                        const base64 = encodeBase64(jsonStr);
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('data', base64);
+                        history.replaceState(null, '', url.toString());
+                    } catch (e) {
+                        // ignore invalid JSON
+                    }
+                }
+            }, POLL_INTERVAL);
+        }
+
+        // Start polling after DOM loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            startRealtimeJsonPolling();
+        });
+        // Toast utility
+function showToast(message, type = 'info') {
+    let toast = document.createElement('div');
+    toast.className = `fixed bottom-6 right-6 z-50 px-4 py-3 rounded shadow-lg text-white font-semibold transition duration-300 ${type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-blue-600'}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 400);
+    }, 2200);
+}
+
+        // อ่านชื่อเจ้าของจาก input
+        function getOwnerName() {
+            return document.getElementById('ownerName').value.trim();
+        }
+
+        // ฟังก์ชันคัดลอกลิงค์ข้อมูลไป clipboard
+        function copyDataUrl() {
+            const bgColors = {
+                bgDay1: document.getElementById('bgDay1').value,
+                bgDay2: document.getElementById('bgDay2').value,
+                bgDay3: document.getElementById('bgDay3').value,
+                bgNight1: document.getElementById('bgNight1').value,
+                bgNight2: document.getElementById('bgNight2').value,
+                bgNight3: document.getElementById('bgNight3').value
+            };
+            const data = {
+                owner: getOwnerName(),
+                activities: activities.map(a => ({ ...a, color: a.color })),
+                background: bgColors
+            };
+            const jsonStr = JSON.stringify(data);
+            const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+            const url = window.location.origin + window.location.pathname + '?data=' + encoded;
+            // คัดลอกไป clipboard
+            navigator.clipboard.writeText(url).then(function() {
+                showToast('คัดลอกลิงค์เรียบร้อย! สามารถนำไปวางได้เลย', 'success');
+            }, function() {
+                showToast('คัดลอกลิงค์ไม่สำเร็จ', 'error');
+            });
+        }
+
+        // โหลดข้อมูลจาก url parameter ถ้ามี (base64 decode)
+        function loadDataFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('data')) {
+                try {
+                    const encoded = params.get('data');
+                    const jsonStr = decodeURIComponent(escape(atob(encoded)));
+                    const data = JSON.parse(jsonStr);
+                    // owner
+                    if (data.owner) {
+                        document.getElementById('ownerName').value = data.owner;
+                        document.getElementById('clockTitle').innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">${data.owner}</span>`;
+                        document.getElementById('printTitle').textContent = `นาฬิกาชีวิตของ: ${data.owner}`;
+                    }
+                    // background
+                    if (data.background) {
+                        document.getElementById('bgDay1').value = data.background.bgDay1 || '#f9d976';
+                        document.getElementById('bgDay2').value = data.background.bgDay2 || '#f39c12';
+                        document.getElementById('bgDay3').value = data.background.bgDay3 || '#e96443';
+                        document.getElementById('bgNight1').value = data.background.bgNight1 || '#232526';
+                        document.getElementById('bgNight2').value = data.background.bgNight2 || '#414345';
+                        document.getElementById('bgNight3').value = data.background.bgNight3 || '#000000';
+                    }
+                    // activities
+                    if (Array.isArray(data.activities)) {
+                        activities = data.activities;
+                    }
+                    updateClockBackground();
+                    updateClock();
+                    updateActivityList();
+                    showToast('โหลดข้อมูลจากลิงก์สำเร็จ', 'success');
+                } catch (e) {
+                    showToast('ไม่สามารถโหลดข้อมูลจากลิงก์ได้', 'error');
+                }
+            } else {
+                updateClockBackground();
+                updateClock();
+                updateActivityList();
+            }
+        }
+
+        // Export all data (activities + background colors) as JSON string
+        function exportJson() {
+            const bgColors = {
+                bgDay1: document.getElementById('bgDay1').value,
+                bgDay2: document.getElementById('bgDay2').value,
+                bgDay3: document.getElementById('bgDay3').value,
+                bgNight1: document.getElementById('bgNight1').value,
+                bgNight2: document.getElementById('bgNight2').value,
+                bgNight3: document.getElementById('bgNight3').value
+            };
+            // รวมสีของกิจกรรมแต่ละรายการด้วย
+            const data = {
+                activities: activities.map(a => ({
+                    ...a,
+                    color: a.color
+                })),
+                background: bgColors
+            };
+            const jsonStr = JSON.stringify(data, null, 2);
+            // ดาวน์โหลดเป็นไฟล์
+            const blob = new Blob([jsonStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'clocklife_data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        // แสดงตัวอย่างสีทันทีที่เลือก
+        const activityColorInput = document.getElementById('activityColor');
+        const activityColorPreview = document.getElementById('activityColorPreview');
+        activityColorInput.addEventListener('input', function() {
+            activityColorPreview.style.background = activityColorInput.value;
+        });
+        // ตั้งค่าเริ่มต้น
+        activityColorPreview.style.background = activityColorInput.value;
         let activities = [];
         let currentRating = 0;
 
@@ -487,30 +748,84 @@
             const title = document.getElementById('clockTitle');
             const printTitle = document.getElementById('printTitle');
             if (name) {
-                title.innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">${name}</span>`;
+                title.innerHTML = `นาฬิกาชีวิตของ: <span class=\"text-purple-600\">${name}</span>`;
                 printTitle.textContent = `นาฬิกาชีวิตของ: ${name}`;
             } else {
-                title.innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">ยังไม่ได้ใส่ชื่อ</span>`;
+                title.innerHTML = `นาฬิกาชีวิตของ: <span class=\"text-purple-600\">ยังไม่ได้ใส่ชื่อ</span>`;
                 printTitle.textContent = `นาฬิกาชีวิตของ: ยังไม่ได้ใส่ชื่อ`;
             }
+            updateAllAndUrl();
+            updateJsonString(); // sync JSON string immediately
         });
 
-        // ฟังก์ชันอัพเดท linear-gradient background
-        function updateClockBackground() {
-            const day1 = document.getElementById('bgDay1').value;
-            const day2 = document.getElementById('bgDay2').value;
-            const day3 = document.getElementById('bgDay3').value;
-            const night1 = document.getElementById('bgNight1').value;
-            const night2 = document.getElementById('bgNight2').value;
-            const night3 = document.getElementById('bgNight3').value;
-            const gradient = `linear-gradient(to bottom, ${day1} 0%, ${day2} 20%, ${day3} 40%, ${night1} 60%, ${night2} 80%, ${night3} 100%)`;
-            document.querySelector('.clock-face').style.setProperty('--clock-gradient', gradient);
+        // ทุก event ที่เปลี่ยนข้อมูล ให้เรียงลำดับ: อัพเดท UI -> อัพเดท json -> อัพเดท url
+        function updateAllAndUrl() {
+            updateClockBackground();
+            updateClock();
+            updateActivityList();
+            updateJsonString();
         }
 
-        // Event listeners for color pickers
+        // อัพเดท json string ทุกครั้งที่ข้อมูลเปลี่ยน (CRUD)
+        function updateJsonString() {
+            const bgColors = {
+                bgDay1: document.getElementById('bgDay1').value,
+                bgDay2: document.getElementById('bgDay2').value,
+                bgDay3: document.getElementById('bgDay3').value,
+                bgNight1: document.getElementById('bgNight1').value,
+                bgNight2: document.getElementById('bgNight2').value,
+                bgNight3: document.getElementById('bgNight3').value
+            };
+            const data = {
+                owner: getOwnerName(),
+                activities: activities.map(a => ({ ...a, color: a.color })),
+                background: bgColors
+            };
+            window.latestJsonString = JSON.stringify(data, null, 2);
+            const jsonBox = document.getElementById('jsonStringBox');
+            if (jsonBox && document.activeElement !== jsonBox) {
+                jsonBox.value = window.latestJsonString;
+            }
+        }
+
+        // ทุกครั้งที่ json string เปลี่ยน ให้ sync ข้อมูลและ url อัตโนมัติ
+        document.addEventListener('DOMContentLoaded', function() {
+            const jsonBox = document.getElementById('jsonStringBox');
+            if (jsonBox) {
+                jsonBox.addEventListener('input', function() {
+                    let data;
+                    try {
+                        data = JSON.parse(jsonBox.value);
+                    } catch (e) {
+                        showToast('JSON ไม่ถูกต้อง', 'error');
+                        return;
+                    }
+                    // owner
+                    if (data.owner !== undefined) {
+                        document.getElementById('ownerName').value = data.owner;
+                    }
+                    // background
+                    if (data.background) {
+                        document.getElementById('bgDay1').value = data.background.bgDay1 || '#f9d976';
+                        document.getElementById('bgDay2').value = data.background.bgDay2 || '#f39c12';
+                        document.getElementById('bgDay3').value = data.background.bgDay3 || '#e96443';
+                        document.getElementById('bgNight1').value = data.background.bgNight1 || '#232526';
+                        document.getElementById('bgNight2').value = data.background.bgNight2 || '#414345';
+                        document.getElementById('bgNight3').value = data.background.bgNight3 || '#000000';
+                    }
+                    // activities
+                    if (Array.isArray(data.activities)) {
+                        activities = data.activities;
+                    }
+                    updateAllAndUrl();
+                });
+            }
+        });
         // ให้ background อัพเดททันทีเมื่อเลือกสี
         ['bgDay1','bgDay2','bgDay3','bgNight1','bgNight2','bgNight3'].forEach(id => {
-            document.getElementById(id).addEventListener('input', updateClockBackground);
+            document.getElementById(id).addEventListener('input', function() {
+                updateAllAndUrl();
+            });
         });
         updateClockBackground();
 
@@ -616,7 +931,7 @@
                         </defs>
                         <path d="${pathData}" fill="${activity.color}" opacity="0.8" stroke="white" stroke-width="2"/>
                         <text fill="white" font-size="12" font-weight="bold">
-                            <textPath href="#${uniqueId}" startOffset="50%" text-anchor="middle">
+                            <textPath href="#${uniqueId}" startOffset="50%" text-anchor="middle" dy="6">
                                 ${activity.name.length > 10 ? activity.name.substring(0, 10) + '...' : activity.name}
                             </textPath>
                         </text>
@@ -719,7 +1034,7 @@
             const color = document.getElementById('activityColor').value;
 
             if (!name) {
-                alert('กรุณากรอกชื่อกิจกรรม');
+                showToast('กรุณากรอกชื่อกิจกรรม', 'error');
                 return;
             }
 
@@ -745,10 +1060,8 @@
             };
 
             activities.push(activity);
-            updateClock();
-            updateActivityList();
-            clearForm();
-            
+            updateAllAndUrl();
+            showToast('เพิ่มกิจกรรมเรียบร้อย', 'success');
             console.log('Activity added:', activity); // Debug log
         }
 
@@ -775,7 +1088,7 @@
 
             // คำนวณ layer ของแต่ละกิจกรรม (กิจกรรมที่ทับกันจะถูกวาดใน layer ที่ต่างกัน)
             // สร้าง array ของ layers: [{activity, layer}]
-            var baseInnerRadius = 160; // จุดเริ่มรัศมีใหญ่ขึ้น
+            var baseInnerRadius = 120; // ลดรัศมีให้วงแรกสุดใกล้จุดศูนย์กลางมากขึ้น
             var layerWidth = 20; // ความหนาแต่ละ layer กว้างขึ้น
             let layers = [];
             activities.forEach((activity, idx) => {
@@ -921,6 +1234,15 @@
                 const isEditing = activity.isEditing;
                 if (isEditing) {
                     // Edit mode
+                    setTimeout(() => {
+                        const colorInput = document.getElementById(`editColor_${activity.id}`);
+                        if (colorInput) {
+                            colorInput.addEventListener('input', function() {
+                                activities = activities.map(a => a.id === activity.id ? { ...a, color: colorInput.value } : a);
+                                updateAllAndUrl(); // อัพเดท url ทุกครั้งที่เปลี่ยนสีในโหมดแก้ไข
+                            });
+                        }
+                    }, 0);
                     return `
                     <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
                         <div class="flex items-center space-x-3">
@@ -968,30 +1290,20 @@
             const legend = document.getElementById('colorLegend');
             const usedColors = [...new Set(activities.map(a => a.color))];
             
-            const colorNames = {
-                '#FF6B6B': '🔴 งาน/การเรียน',
-                '#4ECDC4': '🟢 พักผ่อน',
-                '#45B7D1': '🔵 กีฬา/ออกกำลังกาย',
-                '#96CEB4': '🟡 อาหาร',
-                '#FFEAA7': '🟠 สังคม/เพื่อน',
-                '#DDA0DD': '🟣 งานอดิเรก',
-                '#98D8C8': '🩵 การเดินทาง',
-                '#F7DC6F': '🟤 นอนหลับ'
-            };
 
-            legend.innerHTML = usedColors.map(color => `
-                <div class="flex items-center space-x-2">
+            legend.innerHTML = usedColors.map(color => {
+                const act = activities.find(a => a.color === color);
+                return `<div class="flex items-center space-x-2">
                     <div class="w-3 h-3 rounded" style="background-color: ${color}"></div>
-                    <span class="text-xs">${colorNames[color] || 'อื่นๆ'}</span>
-                </div>
-            `).join('');
+                    <span class="text-xs">${act ? act.name : ''}</span>
+                </div>`;
+            }).join('');
         }
 
         // Remove activity
         function removeActivity(id) {
             activities = activities.filter(activity => activity.id !== id);
-            updateClock();
-            updateActivityList();
+            updateAllAndUrl();
         }
 
         // Edit activity
@@ -1013,7 +1325,7 @@
             const endInput = document.getElementById(`editEnd_${id}`);
             const colorInput = document.getElementById(`editColor_${id}`);
             if (!nameInput.value.trim()) {
-                alert('กรุณากรอกชื่อกิจกรรม');
+                showToast('กรุณากรอกชื่อกิจกรรม', 'error');
                 return;
             }
             const start = parseTime(startInput.value);
@@ -1034,8 +1346,7 @@
                 }
                 return activity;
             });
-            updateClock();
-            updateActivityList();
+            updateAllAndUrl();
         }
 
         // Clear form
@@ -1078,12 +1389,11 @@
             const feedback = document.getElementById('feedback').value.trim();
             
             if (currentRating === 0) {
-                alert('กรุณาให้คะแนนความพึงพอใจ');
+                showToast('กรุณาให้คะแนนความพึงพอใจ', 'error');
                 return;
             }
 
-            alert(`บันทึกการประเมินเรียบร้อย!\nคะแนน: ${currentRating}/5 ดาว\nความคิดเห็น: ${feedback || 'ไม่มี'}`);
-            
+            showToast(`บันทึกการประเมินเรียบร้อย! คะแนน: ${currentRating}/5 ดาว${feedback ? ' | ความคิดเห็น: ' + feedback : ''}`, 'success');
             // Reset evaluation form
             currentRating = 0;
             document.getElementById('feedback').value = '';
@@ -1100,30 +1410,52 @@
                 `${activity.endTime} (+1 วัน)` : 
                 activity.endTime;
             
-            alert(`📋 รายละเอียดกิจกรรม\n\n` +
-                  `🏷️ ชื่อ: ${activity.name}\n` +
-                  `⏰ เวลา: ${activity.startTime} - ${endTimeDisplay}\n` +
-                  `⏱️ ระยะเวลา: ${duration.toFixed(1)} ชั่วโมง\n` +
-                  `🎨 สี: ${getColorName(activity.color)}`);
+            showToast(`📋 ${activity.name} | ${activity.startTime} - ${endTimeDisplay} | ${duration.toFixed(1)} ชม. | สี: ${getColorName(activity.color)}`, 'info');
         }
         
-        // Get color name from color code
-        function getColorName(colorCode) {
-            const colorNames = {
-                '#FF6B6B': '🔴 แดง - งาน/การเรียน',
-                '#4ECDC4': '🟢 เขียว - พักผ่อน',
-                '#45B7D1': '🔵 น้ำเงิน - กีฬา/ออกกำลังกาย',
-                '#96CEB4': '🟡 เหลือง - อาหาร',
-                '#FFEAA7': '🟠 ส้ม - สังคม/เพื่อน',
-                '#DDA0DD': '🟣 ม่วง - งานอดิเรก',
-                '#98D8C8': '🩵 ฟ้า - การเดินทาง',
-                '#F7DC6F': '🟤 น้ำตาล - นอนหลับ'
-            };
-            return colorNames[colorCode] || 'อื่นๆ';
-        }
+ 
 
         // Initialize the application
         initializeClock();
+
+        function updateClockBackground() {
+            const day1 = document.getElementById('bgDay1').value;
+            const day2 = document.getElementById('bgDay2').value;
+            const day3 = document.getElementById('bgDay3').value;
+            const night1 = document.getElementById('bgNight1').value;
+            const night2 = document.getElementById('bgNight2').value;
+            const night3 = document.getElementById('bgNight3').value;
+            const gradient = `linear-gradient(to bottom, ${day1} 0%, ${day2} 20%, ${day3} 40%, ${night1} 60%, ${night2} 80%, ${night3} 100%)`;
+            document.querySelector('.clock-face').style.setProperty('--clock-gradient', gradient);
+            // อัพเดท UI ทันทีหลังเปลี่ยน bg
+            const clockFace = document.getElementById('clockFace');
+            clockFace.style.background = gradient;
+            // สำหรับ print
+            const printClockFace = document.getElementById('printClockFace');
+            printClockFace.style.background = gradient;
+        }
+
+        // อัพเดท url อัตโนมัติทุกครั้งที่ข้อมูลเปลี่ยน (base64 encoding)
+        function updateUrlAuto() {
+            const bgColors = {
+                bgDay1: document.getElementById('bgDay1').value,
+                bgDay2: document.getElementById('bgDay2').value,
+                bgDay3: document.getElementById('bgDay3').value,
+                bgNight1: document.getElementById('bgNight1').value,
+                bgNight2: document.getElementById('bgNight2').value,
+                bgNight3: document.getElementById('bgNight3').value
+            };
+            const data = {
+                owner: getOwnerName(),
+                activities: activities.map(a => ({ ...a, color: a.color })),
+                background: bgColors
+            };
+            const jsonStr = JSON.stringify(data);
+            // base64 encode
+            const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+            const url = window.location.origin + window.location.pathname + '?data=' + encoded;
+            window.history.replaceState({}, '', url);
+        }
     </script>
 </body>
 </html>
