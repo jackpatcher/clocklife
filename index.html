@@ -123,6 +123,97 @@
         .print-layout {
             display: none;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .modal-close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .compact-btn {
+            padding: 8px 16px;
+            margin: 4px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .compact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-add { background: #8b5cf6; color: white; }
+        .btn-add:hover { background: #7c3aed; }
+        
+        .btn-list { background: #06b6d4; color: white; }
+        .btn-list:hover { background: #0891b2; }
+        
+        .btn-evaluate { background: #10b981; color: white; }
+        .btn-evaluate:hover { background: #059669; }
+        
+        .btn-bg { background: #ec4899; color: white; }
+        .btn-bg:hover { background: #db2777; }
+        
+        .btn-json { background: #f59e0b; color: white; }
+        .btn-json:hover { background: #d97706; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-blue-50 min-h-screen p-4">
@@ -133,229 +224,300 @@
 
         <!-- ...existing code... -->
     <!-- ...existing code... -->
-    <!-- เลือกสีพื้นหลังกราฟ 6 สี (กลางวัน 3, กลางคืน 3) -->
-    <div class="flex flex-wrap justify-center gap-6 mt-12 mb-6">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 1</label>
-            <input type="color" id="bgDay1" value="#f9d976" class="w-10 h-8 border rounded-lg" />
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 2</label>
-            <input type="color" id="bgDay2" value="#f39c12" class="w-10 h-8 border rounded-lg" />
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">กลางวัน 3</label>
-            <input type="color" id="bgDay3" value="#e96443" class="w-10 h-8 border rounded-lg" />
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 1</label>
-            <input type="color" id="bgNight1" value="#232526" class="w-10 h-8 border rounded-lg" />
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 2</label>
-            <input type="color" id="bgNight2" value="#414345" class="w-10 h-8 border rounded-lg" />
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">กลางคืน 3</label>
-            <input type="color" id="bgNight3" value="#000000" class="w-10 h-8 border rounded-lg" />
-        </div>
-    </div>
-
         <!-- Header -->
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">🕐 นาฬิกาชีวิต</h1>
             <p class="text-gray-600">สร้างตารางกิจกรรมประจำวันของคุณในรูปแบบนาฬิกา 24 ชั่วโมง</p>
         </div>
 
-        <!-- Owner Name Input -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <label class="block text-lg font-semibold text-gray-700 mb-2">👤 ชื่อเจ้าของนาฬิกาชีวิต:</label>
-            <input type="text" id="ownerName" placeholder="กรอกชื่อของคุณ..." 
-                   class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-lg">
-        </div>
-
-        <div class="grid lg:grid-cols-3 gap-8">
-            <!-- Clock Display -->
-            <div class="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-semibold text-gray-800">
-                        <span id="clockTitle">นาฬิกาชีวิตของ: <span class="text-purple-600">ยังไม่ได้ใส่ชื่อ</span></span>
+        <!-- Main Clock Card -->
+        <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-2">
+                        นาฬิกาชีวิตของ: 
+                        <input type="text" id="ownerName" placeholder="กรอกชื่อของคุณ..." 
+                               class="inline-block bg-transparent border-b-2 border-purple-300 focus:border-purple-600 focus:outline-none text-purple-600 font-semibold text-2xl px-2 py-1"
+                               style="min-width: 200px;">
                     </h2>
-                    <button onclick="printClock()" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center gap-2">
-                        🖨️ พิมพ์นาฬิกาชีวิต
-                    </button>
                 </div>
-                
-                <div class="flex justify-center">
-                    <div class="clock-face" id="clockFace">
-                        <!-- Hour marks and numbers will be generated by JavaScript -->
-                        <div class="center-dot"></div>
-                        <div id="realtimeClockHands"></div>
-                    </div>
-                </div>
-                
-                <!-- Legend -->
-                <div class="mt-6">
-                    <h3 class="text-lg font-semibold mb-3">🎨 สีกิจกรรม:</h3>
-                    <div class="grid grid-cols-2 gap-2 text-sm" id="colorLegend">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
+            </div>
+            
+            <div class="flex justify-center mb-6">
+                <div class="clock-face" id="clockFace">
+                    <!-- Hour marks and numbers will be generated by JavaScript -->
+                    <div class="center-dot"></div>
+                    <div id="realtimeClockHands"></div>
                 </div>
             </div>
 
-            <!-- Activity Form -->
+            <!-- Compact Control Buttons -->
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+                <button onclick="openModal('addActivityModal')" class="compact-btn btn-add">
+                    ➕ เพิ่มกิจกรรม
+                </button>
+                <button onclick="openModal('activityListModal')" class="compact-btn btn-list">
+                    📋 รายการกิจกรรม
+                </button>
+                <button onclick="openModal('evaluateModal')" class="compact-btn btn-evaluate">
+                    ⭐ ประเมินกิจกรรม
+                </button>
+                <button onclick="openModal('backgroundModal')" class="compact-btn btn-bg">
+                    🎨 ตั้งค่าสีพื้นหลัง
+                </button>
+                <button onclick="openModal('jsonModal')" class="compact-btn btn-json">
+                    🔗 JSON Settings
+                </button>
+            </div>
+            
+            <!-- Legend -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold mb-3">🎨 สีกิจกรรม:</h3>
+                <div class="grid grid-cols-2 gap-2 text-sm" id="colorLegend">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Settings Modal -->
+    <div id="backgroundModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-semibold text-gray-800">🎨 ตั้งค่าสีพื้นหลัง</h2>
+                <span class="modal-close" onclick="closeModal('backgroundModal')">&times;</span>
+            </div>
+            
             <div class="space-y-6">
-                <!-- Add Activity Form -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">➕ เพิ่มกิจกรรม</h2>
-                    
-                    <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">🌅 สีกลางวัน</h3>
+                    <div class="grid grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อกิจกรรม:</label>
-                            <input type="text" id="activityName" placeholder="เช่น นอนหลับ, ทำงาน, ออกกำลังกาย..." 
-                                   class="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">กลางวัน 1</label>
+                            <input type="color" id="bgDay1" value="#f9d976" class="w-full h-12 border rounded-lg cursor-pointer" />
                         </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">เวลาเริ่ม:</label>
-                                <div class="flex gap-2">
-                                    <select id="startHour" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
-                                        <option value="0">00</option>
-                                        <option value="1">01</option>
-                                        <option value="2">02</option>
-                                        <option value="3">03</option>
-                                        <option value="4">04</option>
-                                        <option value="5">05</option>
-                                        <option value="6">06</option>
-                                        <option value="7">07</option>
-                                        <option value="8">08</option>
-                                        <option value="9" selected>09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                        <option value="21">21</option>
-                                        <option value="22">22</option>
-                                        <option value="23">23</option>
-                                    </select>
-                                    <span class="flex items-center text-gray-500">:</span>
-                                    <select id="startMinute" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
-                                        <option value="0" selected>00</option>
-                                        <option value="15">15</option>
-                                        <option value="30">30</option>
-                                        <option value="45">45</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">เวลาสิ้นสุด:</label>
-                                <div class="flex gap-2">
-                                    <select id="endHour" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
-                                        <option value="0">00</option>
-                                        <option value="1">01</option>
-                                        <option value="2">02</option>
-                                        <option value="3">03</option>
-                                        <option value="4">04</option>
-                                        <option value="5">05</option>
-                                        <option value="6">06</option>
-                                        <option value="7">07</option>
-                                        <option value="8">08</option>
-                                        <option value="9">09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17" selected>17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                        <option value="21">21</option>
-                                        <option value="22">22</option>
-                                        <option value="23">23</option>
-                                    </select>
-                                    <span class="flex items-center text-gray-500">:</span>
-                                    <select id="endMinute" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
-                                        <option value="0" selected>00</option>
-                                        <option value="15">15</option>
-                                        <option value="30">30</option>
-                                        <option value="45">45</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-right text-sm text-gray-600 mt-2" id="activityDurationPreview">ระยะเวลา: 8.0 ชั่วโมง</div>
-                        
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">สีกิจกรรม:</label>
-                            <div class="flex items-center gap-2">
-                                <input type="color" id="activityColor" value="#FF6B6B" class="w-12 h-8 p-1 border rounded-lg" />
-                                <div id="activityColorPreview" style="width:32px;height:32px;border-radius:8px;border:1px solid #ccc;background:#FF6B6B;"></div>
-                            </div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">กลางวัน 2</label>
+                            <input type="color" id="bgDay2" value="#f39c12" class="w-full h-12 border rounded-lg cursor-pointer" />
                         </div>
-                        
-                        <button onclick="addActivity()" 
-                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
-                            เพิ่มกิจกรรม
-                        </button>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">กลางวัน 3</label>
+                            <input type="color" id="bgDay3" value="#e96443" class="w-full h-12 border rounded-lg cursor-pointer" />
+                        </div>
                     </div>
                 </div>
-
-                <!-- Activity List -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">📋 รายการกิจกรรม</h2>
-                    <div id="activityList" class="space-y-2">
-                        <p class="text-gray-500 text-center py-4">ยังไม่มีกิจกรรม</p>
+                
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">🌙 สีกลางคืน</h3>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">กลางคืน 1</label>
+                            <input type="color" id="bgNight1" value="#232526" class="w-full h-12 border rounded-lg cursor-pointer" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">กลางคืน 2</label>
+                            <input type="color" id="bgNight2" value="#414345" class="w-full h-12 border rounded-lg cursor-pointer" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">กลางคืน 3</label>
+                            <input type="color" id="bgNight3" value="#000000" class="w-full h-12 border rounded-lg cursor-pointer" />
+                        </div>
                     </div>
                 </div>
+                
+                <div class="flex gap-2">
+                    <button onclick="resetBackgroundColors()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                        🔄 รีเซ็ตเป็นค่าเริ่มต้น
+                    </button>
+                    <button onclick="closeModal('backgroundModal')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                        ✅ เสร็จสิ้น
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Evaluation Form -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">⭐ ประเมินกิจกรรม</h2>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">ความพึงพอใจโดยรวม:</label>
-                            <div class="flex space-x-2">
-                                <button onclick="setRating(1)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="1">⭐</button>
-                                <button onclick="setRating(2)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="2">⭐</button>
-                                <button onclick="setRating(3)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="3">⭐</button>
-                                <button onclick="setRating(4)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="4">⭐</button>
-                                <button onclick="setRating(5)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="5">⭐</button>
-                            </div>
-                            <p class="text-sm text-gray-600 mt-1" id="ratingText">คลิกดาวเพื่อให้คะแนน</p>
+    <!-- Add Activity Modal -->
+    <div id="addActivityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-semibold text-gray-800">➕ เพิ่มกิจกรรม</h2>
+                <span class="modal-close" onclick="closeModal('addActivityModal')">&times;</span>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อกิจกรรม:</label>
+                    <input type="text" id="activityName" placeholder="เช่น นอนหลับ, ทำงาน, ออกกำลังกาย..." 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">เวลาเริ่ม:</label>
+                        <div class="flex gap-2">
+                            <select id="startHour" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <option value="0">00</option>
+                                <option value="1">01</option>
+                                <option value="2">02</option>
+                                <option value="3">03</option>
+                                <option value="4">04</option>
+                                <option value="5">05</option>
+                                <option value="6">06</option>
+                                <option value="7">07</option>
+                                <option value="8">08</option>
+                                <option value="9" selected>09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                            </select>
+                            <span class="flex items-center text-gray-500">:</span>
+                            <select id="startMinute" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <option value="0" selected>00</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="45">45</option>
+                            </select>
                         </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">ความคิดเห็น/ข้อเสนอแนะ:</label>
-                            <textarea id="feedback" rows="3" placeholder="เขียนความคิดเห็นเกี่ยวกับการใช้เวลาในวันนี้..." 
-                                      class="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">เวลาสิ้นสุด:</label>
+                        <div class="flex gap-2">
+                            <select id="endHour" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <option value="0">00</option>
+                                <option value="1">01</option>
+                                <option value="2">02</option>
+                                <option value="3">03</option>
+                                <option value="4">04</option>
+                                <option value="5">05</option>
+                                <option value="6">06</option>
+                                <option value="7">07</option>
+                                <option value="8">08</option>
+                                <option value="9">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17" selected>17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                            </select>
+                            <span class="flex items-center text-gray-500">:</span>
+                            <select id="endMinute" class="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                                <option value="0" selected>00</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="45">45</option>
+                            </select>
                         </div>
-                        
-                        <button onclick="saveEvaluation()" 
-                                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
-                            บันทึกการประเมิน
-                        </button>
                     </div>
                 </div>
-                    <!-- JSON String Input Box (always visible, at the bottom of main container) -->
-                <div class="mt-8 mb-8">
-                    <label class="block text-lg font-semibold text-gray-700 mb-2">🔗 JSON string (แก้ไขข้อมูลกิจกรรมและ background ได้โดยตรง):</label>
-                    <textarea id="jsonStringBox" rows="6" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm font-mono" spellcheck="false"></textarea>
-                    <div class="text-right mt-2">
-                        <button id="copyLinkBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">คัดลอกลิงค์</button>
+                <div class="text-right text-sm text-gray-600 mt-2" id="activityDurationPreview">ระยะเวลา: 8.0 ชั่วโมง</div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">สีกิจกรรม:</label>
+                    <div class="flex items-center gap-2">
+                        <input type="color" id="activityColor" value="#FF6B6B" class="w-12 h-8 p-1 border rounded-lg" />
+                        <div id="activityColorPreview" style="width:32px;height:32px;border-radius:8px;border:1px solid #ccc;background:#FF6B6B;"></div>
                     </div>
+                </div>
+                
+                <button onclick="addActivity(); closeModal('addActivityModal')" 
+                        class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                    เพิ่มกิจกรรม
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity List Modal -->
+    <div id="activityListModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-semibold text-gray-800">📋 รายการกิจกรรม</h2>
+                <span class="modal-close" onclick="closeModal('activityListModal')">&times;</span>
+            </div>
+            
+            <div id="activityList" class="space-y-2">
+                <p class="text-gray-500 text-center py-4">ยังไม่มีกิจกรรม</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evaluation Modal -->
+    <div id="evaluateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-semibold text-gray-800">⭐ ประเมินกิจกรรม</h2>
+                <span class="modal-close" onclick="closeModal('evaluateModal')">&times;</span>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ความพึงพอใจโดยรวม:</label>
+                    <div class="flex space-x-2">
+                        <button onclick="setRating(1)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="1">⭐</button>
+                        <button onclick="setRating(2)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="2">⭐</button>
+                        <button onclick="setRating(3)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="3">⭐</button>
+                        <button onclick="setRating(4)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="4">⭐</button>
+                        <button onclick="setRating(5)" class="rating-btn text-2xl p-2 rounded hover:bg-gray-100" data-rating="5">⭐</button>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1" id="ratingText">คลิกดาวเพื่อให้คะแนน</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ความคิดเห็น/ข้อเสนอแนะ:</label>
+                    <textarea id="feedback" rows="3" placeholder="เขียนความคิดเห็นเกี่ยวกับการใช้เวลาในวันนี้..." 
+                              class="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none resize-none"></textarea>
+                </div>
+                
+                <button onclick="saveEvaluation(); closeModal('evaluateModal')" 
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                    บันทึกการประเมิน
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSON Modal -->
+    <div id="jsonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-xl font-semibold text-gray-800">🔗 JSON Settings</h2>
+                <span class="modal-close" onclick="closeModal('jsonModal')">&times;</span>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">JSON String (แก้ไขข้อมูลกิจกรรมและ background ได้โดยตรง):</label>
+                    <textarea id="jsonStringBox" rows="8" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm font-mono" spellcheck="false"></textarea>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button id="copyLinkBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                        📋 คัดลอกลิงค์
+                    </button>
+                    <button onclick="applyJsonData()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                        ✅ นำไปใช้
+                    </button>
                 </div>
             </div>
         </div>
@@ -477,14 +639,11 @@
                         // owner
                         if (newData.owner !== undefined) {
                             document.getElementById('ownerName').value = newData.owner;
-                            // update chart and print title immediately
-                            const title = document.getElementById('clockTitle');
+                            // update print title immediately
                             const printTitle = document.getElementById('printTitle');
                             if (newData.owner) {
-                                title.innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">${newData.owner}</span>`;
                                 printTitle.textContent = `นาฬิกาชีวิตของ: ${newData.owner}`;
                             } else {
-                                title.innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">ยังไม่ได้ใส่ชื่อ</span>`;
                                 printTitle.textContent = `นาฬิกาชีวิตของ: ยังไม่ได้ใส่ชื่อ`;
                             }
                         }
@@ -573,7 +732,6 @@ function showToast(message, type = 'info') {
                     // owner
                     if (data.owner) {
                         document.getElementById('ownerName').value = data.owner;
-                        document.getElementById('clockTitle').innerHTML = `นาฬิกาชีวิตของ: <span class="text-purple-600">${data.owner}</span>`;
                         document.getElementById('printTitle').textContent = `นาฬิกาชีวิตของ: ${data.owner}`;
                     }
                     // background
@@ -659,6 +817,109 @@ function showToast(message, type = 'info') {
         });
         // ตั้งค่าเริ่มต้น
         activityColorPreview.style.background = activityColorInput.value;
+
+        // Background color event listeners
+        ['bgDay1', 'bgDay2', 'bgDay3', 'bgNight1', 'bgNight2', 'bgNight3'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateClockBackground);
+            }
+        });
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            // Update activity list when opening activity list modal
+            if (modalId === 'activityListModal') {
+                updateActivityList();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Apply JSON data function
+        function applyJsonData() {
+            const jsonStr = document.getElementById('jsonStringBox').value.trim();
+            if (!jsonStr) {
+                showToast('กรุณาใส่ข้อมูล JSON', 'error');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(jsonStr);
+                
+                // Update owner
+                if (data.owner !== undefined) {
+                    document.getElementById('ownerName').value = data.owner;
+                    updateOwnerNameDisplay();
+                }
+                
+                // Update background colors
+                if (data.background) {
+                    Object.keys(data.background).forEach(key => {
+                        const element = document.getElementById(key);
+                        if (element && data.background[key]) {
+                            element.value = data.background[key];
+                        }
+                    });
+                    updateBackgroundFromColors();
+                }
+                
+                // Update activities
+                if (Array.isArray(data.activities)) {
+                    activities = data.activities;
+                    updateClock();
+                    updateColorLegend();
+                    updateActivityList();
+                }
+                
+                showToast('นำข้อมูล JSON ไปใช้เรียบร้อย!', 'success');
+                closeModal('jsonModal');
+            } catch (e) {
+                showToast('รูปแบบ JSON ไม่ถูกต้อง: ' + e.message, 'error');
+            }
+        }
+
+        // Helper function to update owner name display
+        function updateOwnerNameDisplay() {
+            const name = document.getElementById('ownerName').value.trim();
+            const ownerInput = document.getElementById('ownerName');
+            const printTitle = document.getElementById('printTitle');
+            if (name) {
+                ownerInput.placeholder = '';
+                printTitle.textContent = `นาฬิกาชีวิตของ: ${name}`;
+            } else {
+                ownerInput.placeholder = 'กรอกชื่อของคุณ...';
+                printTitle.textContent = `นาฬิกาชีวิตของ: ยังไม่ได้ใส่ชื่อ`;
+            }
+        }
+
+        // Helper function to update background from color inputs
+        function updateBackgroundFromColors() {
+            updateClockBackground(); // Use existing function
+        }
+
+        // Reset background colors to default
+        function resetBackgroundColors() {
+            document.getElementById('bgDay1').value = '#f9d976';
+            document.getElementById('bgDay2').value = '#f39c12';
+            document.getElementById('bgDay3').value = '#e96443';
+            document.getElementById('bgNight1').value = '#232526';
+            document.getElementById('bgNight2').value = '#414345';
+            document.getElementById('bgNight3').value = '#000000';
+            updateClockBackground();
+            showToast('รีเซ็ตสีพื้นหลังเรียบร้อย', 'success');
+        }
+        
         let activities = [];
         let currentRating = 0;
 
@@ -813,13 +1074,12 @@ function showToast(message, type = 'info') {
         // Update owner name
         document.getElementById('ownerName').addEventListener('input', function() {
             const name = this.value.trim();
-            const title = document.getElementById('clockTitle');
             const printTitle = document.getElementById('printTitle');
             if (name) {
-                title.innerHTML = `นาฬิกาชีวิตของ: <span class=\"text-purple-600\">${name}</span>`;
+                this.placeholder = '';
                 printTitle.textContent = `นาฬิกาชีวิตของ: ${name}`;
             } else {
-                title.innerHTML = `นาฬิกาชีวิตของ: <span class=\"text-purple-600\">ยังไม่ได้ใส่ชื่อ</span>`;
+                this.placeholder = 'กรอกชื่อของคุณ...';
                 printTitle.textContent = `นาฬิกาชีวิตของ: ยังไม่ได้ใส่ชื่อ`;
             }
             updateAllAndUrl();
@@ -998,7 +1258,7 @@ function showToast(message, type = 'info') {
                             <path id="${uniqueId}" d="${textPathData}" />
                         </defs>
                         <path d="${pathData}" fill="${activity.color}" opacity="0.8" stroke="white" stroke-width="2"/>
-                        <text fill="white" font-size="12" font-weight="bold">
+                        <text fill="white" font-size="12" font-weight="bold" stroke="#000" stroke-width="1" style="paint-order: stroke fill; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));">
                             <textPath href="#${uniqueId}" startOffset="50%" text-anchor="middle" dy="6">
                                 ${activity.name.length > 10 ? activity.name.substring(0, 10) + '...' : activity.name}
                             </textPath>
@@ -1274,7 +1534,7 @@ function showToast(message, type = 'info') {
                             <path id="${uniqueId}" d="${textPathData}" />
                         </defs>
                         <path d="${pathData}" fill="${activity.color}" opacity="0.92" stroke="#fff" stroke-width="4" style="pointer-events: all; cursor: pointer;" filter="url(#shadow)"/>
-                        <text fill="#fff" font-size="15" font-weight="bold" style="pointer-events: none;">
+                        <text fill="#fff" font-size="15" font-weight="bold" stroke="#000" stroke-width="1" style="pointer-events: none; paint-order: stroke fill; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));">
                             <textPath href="#${uniqueId}" startOffset="50%" text-anchor="middle">
                                 ${activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
                             </textPath>
