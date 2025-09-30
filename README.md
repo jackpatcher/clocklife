@@ -1,4 +1,4 @@
 # clocklife
 git add .
-git commit -m "ddd"
+git commit -m "รายการกิจกรรม"
 git push origin main
